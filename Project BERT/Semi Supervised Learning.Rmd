@@ -241,3 +241,33 @@ bench::mark(check = FALSE, iterations = 10,
 ```
 
 
+```{r}
+#example of stemming algorithm 
+
+library(SnowballC)
+
+tidy_fir_tree %>%
+  mutate(stem = wordStem(word)) %>%
+  count(stem, sort = TRUE)
+```
+
+
+```{r}
+#lemmatization examples 
+
+library(spacyr)
+spacy_initialize(entity = FALSE)
+
+fir_tree %>%
+  mutate(doc_id = paste0("doc", row_number())) %>%
+  select(doc_id, everything()) %>%
+  spacy_parse() %>%
+  anti_join(get_stopwords(), by = c("lemma" = "word")) %>%
+  count(lemma, sort = TRUE) %>%
+  top_n(20, n) %>%
+  ggplot(aes(n, fct_reorder(lemma, n))) +
+  geom_col() +
+  labs(x = "Frequency", y = NULL)
+```
+
+
